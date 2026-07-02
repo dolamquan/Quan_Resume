@@ -22,6 +22,18 @@ interface ChatTurn {
 const CHAT_API_URL =
   import.meta.env.VITE_API_URL?.trim() || "http://localhost:3001/api/chat";
 
+function getChatErrorMessage(err: unknown): string {
+  if (err instanceof Error && err.message.startsWith("Request failed with status")) {
+    return `The AI assistant backend responded with an error. ${err.message}.`;
+  }
+
+  const backendLabel = CHAT_API_URL.includes("localhost")
+    ? "the local backend on localhost:3001"
+    : "the deployed backend service";
+
+  return `Couldn't reach ${backendLabel}. Check that the API URL and backend deployment are configured correctly.`;
+}
+
 const SUGGESTION_CHIPS = [
   "Tell me about his experience",
   "What are his technical skills?",
@@ -774,7 +786,7 @@ export default function App() {
         { id: Date.now() + replyLines.length + 1, type: "output", content: "" },
       ]);
     } catch (err) {
-      const errorMessage = "Couldn't reach the AI assistant backend. Is the server running on localhost:3001?";
+      const errorMessage = getChatErrorMessage(err);
 
       setChatTurns((prev) => [
         ...prev,
