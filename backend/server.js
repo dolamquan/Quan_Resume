@@ -14,14 +14,19 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const app = express();
 const allowedOrigins = [
-  process.env.FRONTEND_ORIGIN,
+  ...(process.env.FRONTEND_ORIGIN || "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean),
   "http://localhost:5173",
 ].filter(Boolean);
 
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+      const isAllowedVercelPreview = typeof origin === "string" && origin.endsWith(".vercel.app");
+
+      if (!origin || allowedOrigins.includes(origin) || isAllowedVercelPreview) {
         return callback(null, true);
       }
 
