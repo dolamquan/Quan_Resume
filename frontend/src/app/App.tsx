@@ -19,7 +19,8 @@ interface ChatTurn {
   time: string;
 }
 
-const CHAT_API_URL = "http://localhost:3001/api/chat";
+const CHAT_API_URL =
+  import.meta.env.VITE_API_URL?.trim() || "http://localhost:3001/api/chat";
 
 const SUGGESTION_CHIPS = [
   "Tell me about his experience",

@@ -13,7 +13,22 @@ if (!process.env.OPENAI_API_KEY) {
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const app = express();
-app.use(cors());
+const allowedOrigins = [
+  process.env.FRONTEND_ORIGIN,
+  "http://localhost:5173",
+].filter(Boolean);
+
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Origin not allowed by CORS"));
+    },
+  })
+);
 app.use(express.json());
 
 app.post("/api/chat", async (req, res) => {
